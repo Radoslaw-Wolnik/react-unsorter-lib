@@ -1,0 +1,24 @@
+{
+  "name": "react-unsorter-lib",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "pkg"
+  ],
+  "scripts": {
+    "build:wasm": "cd ../rust-unsorter && wasm-pack build --target bundler --out-dir ../wrapper/pkg",
+    "build": "npm run build:wasm && tsc -p tsconfig.json",
+    "clean": "rimraf dist pkg",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "rimraf": "^6.0.0"
+  },
+  "keywords": ["wasm", "rust", "shuffle", "random"],
+  "license": "MIT"
+}
