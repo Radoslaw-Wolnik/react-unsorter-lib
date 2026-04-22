@@ -13,6 +13,9 @@ This project is intentionally a little silly — it exists mostly as a hands-on 
 
 The result is a package that is easy to consume from React, while the heavy lifting happens in Rust.
 
+### Snapshot of demo app
+![alt text](snapshot.png "The screenshot with the app demo")
+
 ## What it does
 
 `react-unsorter-lib` exposes two main functions for working with number arrays:
