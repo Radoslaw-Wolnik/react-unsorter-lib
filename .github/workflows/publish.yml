@@ -6,17 +6,19 @@ on:
 
 defaults:
   run:
-    working-directory: ./wrapper   # <-- All `run` steps will execute inside `wrapper/`
+    working-directory: ./wrapper
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write      # Required to push version bump commit
       packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}   # Allows pushing commits back
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -33,11 +35,30 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@radoslaw-wolnik'   # Must be lowercase!
+          scope: '@radoslaw-wolnik'
 
       - name: Install npm dependencies
         run: npm install
-        # working-directory is ./wrapper due to defaults
+
+      # ---------- Version Bump Step ----------
+      - name: Bump version and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Determine if current version is a pre-release (contains '-')
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$CURRENT_VERSION" == *"-"* ]]; then
+            # Pre-release: bump the pre-release number (e.g., 0.2.1-alpha.1 → 0.2.1-alpha.2)
+            npm version prerelease --preid=alpha -m "chore(release): bump to %s [skip ci]"
+          else
+            # Stable version: bump patch (0.2.1 → 0.2.2)
+            npm version patch -m "chore(release): bump to %s [skip ci]"
+          fi
+
+          git push --follow-tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build package (WASM + TypeScript)
         run: npm run build
