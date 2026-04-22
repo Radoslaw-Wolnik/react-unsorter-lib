@@ -1,11 +1,41 @@
+import * as wasm from "../pkg/rust_unsorter.js";
 import { unsort as wasmUnsort, Algorithm as WasmAlgorithm } from "../pkg/rust_unsorter.js";
+
+export { WasmAlgorithm as Algorithm };
 
 export type UnsortOptions = {
   algorithm?: WasmAlgorithm;
   seed?: number;
 };
 
-export { WasmAlgorithm as Algorithm };
+export type UnsortStep = {
+  kind: "swap";
+  i: number;
+  j: number;
+};
+
+export interface UnsortTrace {
+  result: Int32Array;
+  steps: UnsortStep[];
+}
+
+type RawTraceResult = {
+  result: number[];
+  steps: UnsortStep[];
+};
+
+const unsortImpl = wasmUnsort as (
+  input: Int32Array,
+  algorithm?: WasmAlgorithm,
+  seed?: number
+) => Int32Array;
+
+const wasmAny = wasm as any;
+const unsortStepsImpl = (wasmAny.unsortSteps ?? wasmAny.unsort_steps) as (
+  input: Int32Array,
+  algorithm?: WasmAlgorithm,
+  seed?: number
+) => RawTraceResult;
 
 export function unsort(
   input: number[] | Int32Array,
@@ -13,9 +43,18 @@ export function unsort(
 ): Int32Array {
   const arr = input instanceof Int32Array ? input : Int32Array.from(input);
 
-  return wasmUnsort(
-    arr,
-    options.algorithm ?? WasmAlgorithm.Random,
-    options.seed
-  );
+  return unsortImpl(arr, options.algorithm ?? WasmAlgorithm.Random, options.seed);
+}
+
+export function unsortSteps(
+  input: number[] | Int32Array,
+  options: UnsortOptions = {}
+): UnsortTrace {
+  const arr = input instanceof Int32Array ? input : Int32Array.from(input);
+  const raw = unsortStepsImpl(arr, options.algorithm ?? WasmAlgorithm.Random, options.seed);
+
+  return {
+    result: Int32Array.from(raw.result),
+    steps: raw.steps,
+  };
 }
