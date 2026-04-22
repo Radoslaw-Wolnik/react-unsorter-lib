@@ -40,18 +40,33 @@ jobs:
       - name: Install npm dependencies
         run: npm install
 
-      # ---------- Version Bump ----------
-      - name: Bump patch version (alpha.0)
+      # ---------- Bump patch version with alpha ----------
+      - name: Bump patch version (alpha)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          npm version patch --preid=alpha -m "chore(release): bump to %s [skip ci]"
+
+          # Read current version from package.json
+          CURRENT=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT"
+
+          # Strip any existing prerelease suffix, bump patch, re-add -alpha
+          BASE=$(echo "$CURRENT" | sed 's/-.*//')   # e.g. 0.2.3
+          MAJOR=$(echo "$BASE" | cut -d. -f1)
+          MINOR=$(echo "$BASE" | cut -d. -f2)
+          PATCH=$(echo "$BASE" | cut -d. -f3)
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}-alpha"
+          echo "New version: $NEW_VERSION"
+
+          # Write it back and commit
+          npm version "$NEW_VERSION" --no-git-tag-version
+          git add package.json package-lock.json
+          git commit -m "chore(release): bump to ${NEW_VERSION} [skip ci]"
+          git tag "v${NEW_VERSION}"
           git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build package (WASM + TypeScript)
-        run: npm run build
 
       # ---------- Publish with alpha dist-tag ----------
       - name: Publish to GitHub Packages
