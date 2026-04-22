@@ -12,13 +12,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write      # Required to push version bump commit
+      contents: write      # Allows pushing the version bump commit
       packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}   # Allows pushing commits back
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -40,13 +40,11 @@ jobs:
       - name: Install npm dependencies
         run: npm install
 
-      # ---------- Version Bump Step ----------
-      - name: Bump patch version
+      # ---------- Version Bump ----------
+      - name: Bump patch version (alpha.0)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      
-          # Bump patch and add alpha.0
           npm version patch --preid=alpha -m "chore(release): bump to %s [skip ci]"
           git push --follow-tags
         env:
@@ -54,9 +52,9 @@ jobs:
 
       - name: Build package (WASM + TypeScript)
         run: npm run build
-        # Note: build:wasm script assumes ../rust-unsorter exists relative to wrapper
 
+      # ---------- Publish with alpha dist-tag ----------
       - name: Publish to GitHub Packages
-        run: npm publish
+        run: npm publish --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
