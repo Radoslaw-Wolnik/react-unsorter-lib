@@ -8,13 +8,19 @@ This project is intentionally a little silly — it exists mostly as a hands-on 
 * compile Rust to WebAssembly
 * expose a clean JavaScript/TypeScript API from a Rust library
 * wrap low-level WASM exports in a nicer React-friendly package
-* use the package in a real Vite + React demo app
+* build a real Vite + React demo app on top of the package
+* add step-by-step visual tracing for algorithm playback
 
 The result is a package that is easy to consume from React, while the heavy lifting happens in Rust.
 
 ## What it does
 
-`react-unsorter-lib` exposes an `unsort()` function that takes a list of numbers and returns a new `Int32Array` with the values rearranged using one of several algorithms:
+`react-unsorter-lib` exposes two main functions for working with number arrays:
+
+* `unsort()` — returns a new array with the values rearranged using one of several algorithms
+* `unsortSteps()` — returns the final result plus a list of swap steps that can be replayed in a UI
+
+Available algorithms:
 
 * `Random` — shuffles the array randomly
 * `LastFirst` — swaps items from the outside in
@@ -34,7 +40,7 @@ react-unsorter-lib/
 
 ### `rust-unsorter`
 
-The Rust crate contains the actual algorithms and the WASM bindings. It exports the core `unsort` function and the `Algorithm` enum.
+The Rust crate contains the actual algorithms and the WASM bindings. It exports the core `unsort` function, the `unsortSteps` trace function, and the `Algorithm` enum.
 
 ### `wrapper`
 
@@ -42,7 +48,7 @@ This is the ergonomic TypeScript package that application code imports. It hides
 
 ### `demo-app`
 
-A small Vite + React app that shows the library in action with a visualizer and controls for algorithm selection and seed input.
+A small Vite + React app that shows the library in action with a polished visualizer, mode switching, playback controls, and bar highlighting.
 
 ## Why the wrapper exists
 
@@ -52,6 +58,7 @@ The Rust/WASM layer is intentionally kept low-level. The wrapper makes the packa
 * providing TypeScript types for the public API
 * exposing a simple import path for app code
 * hiding WASM-specific details from the demo app
+* normalizing the trace result so the UI can use it easily
 
 That means React code can call the library like a normal package instead of dealing with the lower-level WASM export directly.
 
@@ -129,6 +136,8 @@ The `optimizeDeps.exclude` entry helps Vite avoid pre-bundling the local WASM pa
 
 ## Usage
 
+### Instant mode
+
 ```ts
 import { unsort, Algorithm } from 'react-unsorter-lib';
 
@@ -140,6 +149,19 @@ const output = unsort(input, {
 });
 
 console.log(output); // Int32Array
+```
+
+### Trace mode
+
+```ts
+import { unsortSteps, Algorithm } from 'react-unsorter-lib';
+
+const trace = unsortSteps([1, 2, 3, 4, 5], {
+  algorithm: Algorithm.LastFirst,
+});
+
+console.log(trace.result); // Int32Array
+console.log(trace.steps);  // swap steps for animation
 ```
 
 ### API
@@ -154,21 +176,38 @@ unsort(
 ): Int32Array
 ```
 
+```ts
+unsortSteps(
+  input: number[] | Int32Array,
+  options?: {
+    algorithm?: Algorithm;
+    seed?: number;
+  }
+): {
+  result: Int32Array;
+  steps: Array<{ kind: 'swap'; i: number; j: number }>;
+}
+```
+
 ### Notes
 
 * `input` can be either a regular `number[]` or an `Int32Array`
-* the result is returned as an `Int32Array`
+* the result of `unsort()` is returned as an `Int32Array`
+* `unsortSteps()` returns both the final result and a list of swap operations
 * `seed` is optional and only matters for the seeded random path
 
 ## Demo app
 
-The demo app shows the library in a playful UI:
+The demo app shows the library in a more polished UI:
 
 * generate a sorted array
 * choose an algorithm
 * optionally set a seed
-* click **Unsort** to see the result
-* create a new array and try again
+* switch between **Instant** and **Step-by-step** modes
+* click **Unsort** for a fast result
+* click **Generate trace** to replay the swaps visually
+* use playback controls to pause, step once, reset, or change speed
+* see the changed bars highlighted during playback
 
 It is not meant to be a serious sorting visualizer. It is a learning demo that makes the WASM package easier to understand and test.
 
@@ -182,6 +221,7 @@ A few things worth knowing:
 * the wrapper keeps the consumer API small and pleasant
 * the demo app is there to prove the package works in a real React setup
 * the project structure is split intentionally so each layer can be learned independently
+* step tracing is implemented as a lightweight observer layer so the non-traced path stays clean
 
 ## License
 
