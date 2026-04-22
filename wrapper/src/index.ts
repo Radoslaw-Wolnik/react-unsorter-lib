@@ -1,28 +1,9 @@
 import * as wasm from "../pkg/rust_unsorter.js";
 import { unsort as wasmUnsort, Algorithm as WasmAlgorithm } from "../pkg/rust_unsorter.js";
-
+import type { UnsortOptions, UnsortTrace, RawTraceResult, UnsortStep } from "./types.js";
 export { WasmAlgorithm as Algorithm };
+export type { UnsortOptions, UnsortStep, UnsortTrace };
 
-export type UnsortOptions = {
-  algorithm?: WasmAlgorithm;
-  seed?: number;
-};
-
-export type UnsortStep = {
-  kind: "swap";
-  i: number;
-  j: number;
-};
-
-export interface UnsortTrace {
-  result: Int32Array;
-  steps: UnsortStep[];
-}
-
-type RawTraceResult = {
-  result: number[];
-  steps: UnsortStep[];
-};
 
 const unsortImpl = wasmUnsort as (
   input: Int32Array,
