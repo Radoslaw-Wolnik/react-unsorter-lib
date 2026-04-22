@@ -1,14 +1,14 @@
 pub mod algorithms;
 pub mod trace;
 
-use wasm_bindgen::prelude::*;
 use algorithms::{
-    Unsorter,
-    random::RandomUnsorter,
     last_first::LastFirstUnsorter,
-    recursive::RecursiveUnsorter,
     mask::MaskUnsorter,
+    random::RandomUnsorter,
+    recursive::RecursiveUnsorter,
 };
+use trace::TraceResult;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub enum Algorithm {
@@ -19,39 +19,47 @@ pub enum Algorithm {
 }
 
 #[wasm_bindgen]
-pub fn unsort(
-    input: &[i32],
-    algorithm: Option<Algorithm>,
-    seed: Option<f64>,
-) -> Vec<i32> {
+pub fn unsort(input: &[i32], algorithm: Option<Algorithm>, seed: Option<f64>) -> Vec<i32> {
     let algo = algorithm.unwrap_or(Algorithm::Random);
-
-   let seedu = match seed {
-        Some(s) => Some(s as u64),
-        None => None,
-    };
+    let seed = seed.map(|s| s as u64);
 
     match algo {
         Algorithm::Random => {
-            if let Some(seed) = seedu {
-                seeded_random(input, seed)
+            if let Some(seed) = seed {
+                RandomUnsorter::unsort_seeded(input, seed)
             } else {
-                RandomUnsorter.unsort(input)
+                RandomUnsorter::unsort(input)
             }
         }
-        Algorithm::LastFirst => LastFirstUnsorter.unsort(input),
-        Algorithm::Recursive => RecursiveUnsorter.unsort(input),
-        Algorithm::Mask => MaskUnsorter.unsort(input),
+        Algorithm::LastFirst => LastFirstUnsorter::unsort(input),
+        Algorithm::Recursive => RecursiveUnsorter::unsort(input),
+        Algorithm::Mask => MaskUnsorter::unsort(input),
     }
 }
 
-use rand::{SeedableRng};
-use rand::rngs::StdRng;
-use rand::seq::SliceRandom;
+#[wasm_bindgen]
+pub fn unsort_steps(
+    input: &[i32],
+    algorithm: Option<Algorithm>,
+    seed: Option<f64>,
+) -> JsValue {
+    let algo = algorithm.unwrap_or(Algorithm::Random);
+    let seed = seed.map(|s| s as u64);
 
-fn seeded_random<T: Clone>(input: &[T], seed: u64) -> Vec<T> {
-    let mut rng = StdRng::seed_from_u64(seed);
-    let mut result = input.to_vec();
-    result.shuffle(&mut rng);
-    result
+    let mut steps = Vec::new();
+
+    let result = match algo {
+        Algorithm::Random => {
+            if let Some(seed) = seed {
+                RandomUnsorter::unsort_seeded_with_steps(input, seed, &mut steps)
+            } else {
+                RandomUnsorter::unsort_with_steps(input, &mut steps)
+            }
+        }
+        Algorithm::LastFirst => LastFirstUnsorter::unsort_with_steps(input, &mut steps),
+        Algorithm::Recursive => RecursiveUnsorter::unsort_with_steps(input, &mut steps),
+        Algorithm::Mask => MaskUnsorter::unsort_with_steps(input, &mut steps),
+    };
+
+    serde_wasm_bindgen::to_value(&TraceResult { result, steps }).unwrap()
 }
