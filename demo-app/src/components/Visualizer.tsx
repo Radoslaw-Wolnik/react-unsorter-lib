@@ -25,7 +25,7 @@ export default function Visualizer({
   const clampedProgress = Math.max(0, Math.min(100, progress));
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-border bg-panel/80 p-4 shadow-2xl shadow-black/20">
+    <div className="visualizer-shell">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.10),transparent_45%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary-soft/30 to-transparent" />
 
@@ -70,11 +70,9 @@ export default function Visualizer({
         )}
       </div>
 
-      <div className="relative h-104 overflow-hidden rounded-2xl border border-border bg-bg/40 px-3 pt-3 pb-3">
+      <div className="visualizer-stage">
         {data.length === 0 ? (
-          <div className="flex h-full w-full items-center justify-center text-sm text-muted">
-            No data yet
-          </div>
+          <div className="visualizer-empty">No data yet</div>
         ) : (
           <div className="flex h-full items-end gap-1">
             {data.map((value, index) => {
@@ -84,9 +82,9 @@ export default function Visualizer({
 
               const barClass = active
                 ? first
-                  ? "bg-[linear-gradient(to_top,var(--color-accent)_0%,var(--color-accent-soft)_55%,#fef3c7_100%)]"
-                  : "bg-[linear-gradient(to_top,var(--color-danger)_0%,#fb7185_55%,#fecdd3_100%)]"
-                : "bg-gradient-to-t from-primary via-primary-soft to-primary";
+                  ? "bar-active-a"
+                  : "bar-active-b"
+                : "bar-default";
 
               const heightPct = ((value + 1) / (max + 1)) * 100;
 
@@ -111,11 +109,7 @@ export default function Visualizer({
                   </div>
 
                   <div className="mt-2 flex h-3 items-center justify-center">
-                    {(first || second) && (
-                      <div
-                        className={`h-2 w-2 rounded-full bg-text/90 shadow-lg shadow-white/20`}
-                      />
-                    )}
+                    {(first || second) && <div className="visualizer-dot" />}
                   </div>
                 </div>
               );

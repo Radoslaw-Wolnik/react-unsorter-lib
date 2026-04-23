@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  Algorithm,
-  unsort,
-  unsortSteps,
-  type UnsortTrace,
-} from "react-unsorter-lib";
+import { Algorithm, unsort, unsortSteps, type UnsortTrace } from "react-unsorter-lib";
 import { RotateCcw } from "lucide-react";
 import Visualizer from "./components/Visualizer";
-
-type Mode = "instant" | "trace";
+import { Button, Card, RangeField, StatCard, TextField } from "./components/ui";
 
 const ALGORITHMS = [
   { value: Algorithm.Random, label: "Random" },
@@ -41,32 +35,8 @@ function swapCopy(arr: number[], i: number, j: number) {
   return next;
 }
 
-function Stat({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <div className="rounded-2xl border border-border bg-panel/70 px-4 py-3 shadow-sm shadow-black/20">
-      <div className="text-[11px] uppercase tracking-[0.25em] text-muted">
-        {label}
-      </div>
-      <div className="mt-1 text-sm font-medium text-text">{value}</div>
-    </div>
-  );
-}
-
-const cardBase =
-  "rounded-3xl border border-border bg-surface/75 shadow-2xl shadow-black/20 backdrop-blur";
-const subtleButton =
-  "rounded-xl border border-border bg-panel-strong/90 px-4 py-2 text-sm font-medium text-text transition hover:bg-panel-strong disabled:cursor-not-allowed disabled:opacity-50";
-const activeButton =
-  "rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-bg transition hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-50";
-
 export default function App() {
-  const [mode, setMode] = useState<Mode>("instant");
+  const [mode, setMode] = useState<"instant" | "trace">("instant");
   const [algorithm, setAlgorithm] = useState<Algorithm>(Algorithm.Random);
   const [seedText, setSeedText] = useState("");
   const [arraySizeText, setArraySizeText] = useState("48");
@@ -78,9 +48,7 @@ export default function App() {
   const [stepIndex, setStepIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(55);
-  const [activeIndices, setActiveIndices] = useState<[number, number] | null>(
-    null
-  );
+  const [activeIndices, setActiveIndices] = useState<[number, number] | null>(null);
   const [startingData, setStartingData] = useState<number[] | null>(null);
 
   const seed = parseSeed(seedText);
@@ -124,7 +92,6 @@ export default function App() {
     setArraySizeText(digits);
 
     if (digits === "") return;
-
     regenerateArray(parseArraySize(digits));
   }
 
@@ -174,8 +141,7 @@ export default function App() {
   }
 
   const totalSteps = trace?.steps.length ?? 0;
-  const progress =
-    totalSteps === 0 ? 0 : Math.min(100, (stepIndex / totalSteps) * 100);
+  const progress = totalSteps === 0 ? 0 : Math.min(100, (stepIndex / totalSteps) * 100);
 
   const nextStep =
     trace && stepIndex < trace.steps.length ? trace.steps[stepIndex] : null;
@@ -183,7 +149,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-transparent text-text">
       <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
-        <div className={cardBase}>
+        <div className="app-shell">
           <header className="flex flex-col gap-4 border-b border-border p-6">
             <div>
               <p className="text-xs uppercase tracking-[0.32em] text-primary-soft/80">
@@ -194,7 +160,7 @@ export default function App() {
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
                 A playful learning project that turns a Rust WebAssembly package
-                into a small React demo. <br></br> Switch between instant unsorting and a
+                into a small React demo. Switch between instant unsorting and a
                 step-by-step trace mode that shows each swap as it happens.
               </p>
             </div>
@@ -214,18 +180,17 @@ export default function App() {
               />
 
               <div className="grid gap-3 sm:grid-cols-3">
-                <Stat
+                <StatCard
                   label="Mode"
                   value={mode === "instant" ? "Instant" : "Step-by-step"}
                 />
-                <Stat
+                <StatCard
                   label="Current algorithm"
                   value={
-                    ALGORITHMS.find((a) => a.value === algorithm)?.label ??
-                    "Random"
+                    ALGORITHMS.find((a) => a.value === algorithm)?.label ?? "Random"
                   }
                 />
-                <Stat
+                <StatCard
                   label="Current step"
                   value={
                     mode === "trace"
@@ -237,161 +202,109 @@ export default function App() {
             </div>
 
             <aside className="space-y-6">
-              <div className="rounded-3xl border border-border bg-panel/70 p-5">
-                <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-text/80">
-                  Controls
-                </h2>
+              <Card className="p-5">
+                <h2 className="section-kicker">Controls</h2>
 
                 <div className="mt-5 space-y-5">
                   <div>
-                    <p className="mb-2 text-xs uppercase tracking-[0.22em] text-muted">
-                      Mode
-                    </p>
+                    <p className="field-label mb-2">Mode</p>
                     <div className="flex flex-wrap gap-2">
-                      <button
+                      <Button
+                        shape="pill"
+                        active={mode === "instant"}
                         onClick={() => setMode("instant")}
-                        className={
-                          mode === "instant"
-                            ? "rounded-full bg-primary px-4 py-2 text-sm font-medium text-bg transition hover:bg-primary-soft"
-                            : "rounded-full border border-border bg-panel-strong/90 px-4 py-2 text-sm font-medium text-text transition hover:bg-panel-strong"
-                        }
                       >
                         Instant
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        shape="pill"
+                        active={mode === "trace"}
                         onClick={() => setMode("trace")}
-                        className={
-                          mode === "trace"
-                            ? "rounded-full bg-primary px-4 py-2 text-sm font-medium text-bg transition hover:bg-primary-soft"
-                            : "rounded-full border border-border bg-panel-strong/90 px-4 py-2 text-sm font-medium text-text transition hover:bg-panel-strong"
-                        }
                       >
                         Step-by-step
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
                   <div>
-                    <p className="mb-2 text-xs uppercase tracking-[0.22em] text-muted">
-                      Algorithm
-                    </p>
+                    <p className="field-label mb-2">Algorithm</p>
                     <div className="grid grid-cols-2 gap-2">
                       {ALGORITHMS.map((item) => (
-                        <button
+                        <Button
                           key={item.label}
+                          active={algorithm === item.value}
                           onClick={() => setAlgorithm(item.value)}
-                          className={
-                            algorithm === item.value
-                              ? "rounded-xl bg-primary px-3 py-2 text-sm font-medium text-bg transition hover:bg-primary-soft"
-                              : "rounded-xl border border-border bg-panel-strong/90 px-3 py-2 text-sm font-medium text-text transition hover:bg-panel-strong"
-                          }
                         >
                           {item.label}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>
 
-                  <label className="flex flex-col gap-2">
-                    <span className="text-xs uppercase tracking-[0.22em] text-muted">
-                      Array size
-                    </span>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      placeholder="48"
-                      value={arraySizeText}
-                      onChange={(e) => handleArraySizeChange(e.target.value)}
-                      className="rounded-xl border border-border bg-bg/70 px-4 py-3 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary"
-                    />
-                  </label>
+                  <TextField
+                    label="Array size"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="48"
+                    value={arraySizeText}
+                    onChange={(e) => handleArraySizeChange(e.target.value)}
+                  />
 
-                  <label className="flex flex-col gap-2">
-                    <span className="text-xs uppercase tracking-[0.22em] text-muted">
-                      Seed
-                    </span>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="optional"
-                      value={seedText}
-                      onChange={(e) => setSeedText(e.target.value)}
-                      className="rounded-xl border border-border bg-bg/70 px-4 py-3 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary"
-                    />
-                  </label>
+                  <TextField
+                    label="Seed"
+                    inputMode="numeric"
+                    placeholder="optional"
+                    value={seedText}
+                    onChange={(e) => setSeedText(e.target.value)}
+                  />
 
                   <div className="flex flex-wrap gap-3">
-                    <button
-                      onClick={runUnsort}
-                      className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-bg transition hover:bg-accent-soft"
-                    >
+                    <Button variant="accent" onClick={runUnsort}>
                       {mode === "instant" ? "Unsort" : "Generate trace"}
-                    </button>
+                    </Button>
 
-                    <button
-                      onClick={sortToFreshArray}
-                      className="inline-flex items-center gap-2 rounded-xl border border-border bg-panel-strong/90 px-4 py-2.5 text-sm font-medium text-text transition hover:bg-panel-strong"
-                    >
+                    <Button onClick={sortToFreshArray}>
                       <RotateCcw className="h-4 w-4" />
                       Sort
-                    </button>
+                    </Button>
                   </div>
                 </div>
-              </div>
+              </Card>
 
               {mode === "trace" && (
-                <div className="rounded-3xl border border-border bg-panel/70 p-5">
-                  <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-text/80">
-                    Trace controls
-                  </h2>
+                <Card className="p-5">
+                  <h2 className="section-kicker">Trace controls</h2>
 
                   <div className="mt-5 flex flex-wrap items-center gap-3">
-                    <button
+                    <Button
+                      variant="accent"
                       onClick={() => setPlaying((p) => !p)}
                       disabled={totalSteps === 0}
-                      className={activeButton}
                     >
                       {playing ? "Pause" : "Play"}
-                    </button>
+                    </Button>
 
-                    <button
-                      onClick={stepOnce}
-                      disabled={totalSteps === 0}
-                      className={subtleButton}
-                    >
+                    <Button onClick={stepOnce} disabled={totalSteps === 0}>
                       Step once
-                    </button>
+                    </Button>
 
-                    <button
-                      onClick={replayTrace}
-                      disabled={!startingData}
-                      className={subtleButton}
-                    >
+                    <Button onClick={replayTrace} disabled={!startingData}>
                       Replay trace
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="mt-5">
-                    <div className="mb-2 flex items-center justify-between text-xs text-muted">
-                      <span>Playback speed</span>
-                      <span className="tabular-nums">{playbackSpeed}/100</span>
-                    </div>
-                    <input
-                      type="range"
+                    <RangeField
+                      label="Playback speed"
+                      valueLabel={`${playbackSpeed}/100`}
                       min={1}
                       max={100}
                       step={1}
                       value={playbackSpeed}
                       onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
-                      className="w-full accent-primary"
                     />
-                    <div className="mt-1 flex justify-between text-[11px] text-muted">
-                      <span>Slower</span>
-                      <span>Faster</span>
-                    </div>
                   </div>
-                </div>
+                </Card>
               )}
             </aside>
           </div>

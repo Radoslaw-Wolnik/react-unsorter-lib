@@ -25,11 +25,90 @@ body,
 body {
   margin: 0;
   background:
-    radial-gradient(circle at top, rgba(245, 158, 11, 0.10), transparent 35%),
+    radial-gradient(circle at top, rgba(245, 158, 11, 0.1), transparent 35%),
     linear-gradient(180deg, #0b0d10 0%, #090a0d 100%);
   color: var(--color-text);
 }
 
 * {
   box-sizing: border-box;
+}
+
+@layer components {
+  .app-shell {
+    @apply rounded-3xl border border-border bg-surface/75 shadow-2xl shadow-black/20 backdrop-blur;
+  }
+
+  .panel-card {
+    @apply rounded-3xl border border-border bg-panel/70;
+  }
+
+  .section-kicker {
+    @apply text-sm font-semibold uppercase tracking-[0.25em] text-text/80;
+  }
+
+  .field-label {
+    @apply text-xs uppercase tracking-[0.22em] text-muted;
+  }
+
+  .input-base {
+    @apply rounded-xl border border-border bg-bg/70 px-4 py-3 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary;
+  }
+
+  .btn-base {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-rounded {
+    @apply rounded-xl;
+  }
+
+  .btn-pill {
+    @apply rounded-full;
+  }
+
+  .btn-neutral {
+    @apply border border-border bg-panel-strong/90 text-text
+          hover:brightness-175;
+  }
+
+  .btn-active {
+    @apply border-transparent bg-primary font-semibold text-bg hover:bg-primary-soft;
+  }
+
+  .btn-accent {
+    @apply border-transparent bg-accent font-semibold text-bg hover:bg-accent-soft;
+  }
+
+  .stat-card {
+    @apply rounded-2xl border border-border bg-panel/70 px-4 py-3 shadow-sm shadow-black/20;
+  }
+
+  .visualizer-shell {
+    @apply relative overflow-hidden rounded-3xl border border-border bg-panel/80 p-4 shadow-2xl shadow-black/20;
+  }
+
+  .visualizer-stage {
+    @apply relative h-104 overflow-hidden rounded-2xl border border-border bg-bg/40 px-3 pb-3 pt-3;
+  }
+
+  .visualizer-empty {
+    @apply flex h-full w-full items-center justify-center text-sm text-muted;
+  }
+
+  .visualizer-dot {
+    @apply h-2 w-2 rounded-full bg-text/90 shadow-lg shadow-white/20;
+  }
+
+  .bar-default {
+      @apply bg-linear-to-t from-primary-soft to-primary;
+  }
+
+  .bar-active-a {
+    background: linear-gradient(to top, var(--color-accent-soft), #fef3c7);
+  }
+
+  .bar-active-b {
+    background: linear-gradient(to top, var(--color-danger), #fb7185, #fecdd3);
+  }
 }
