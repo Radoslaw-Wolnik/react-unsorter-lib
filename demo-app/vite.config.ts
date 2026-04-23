@@ -12,5 +12,8 @@ export default defineConfig({
   ],
   optimizeDeps: {
     exclude: ['react-unsorter-lib']
-  }
+  },
+  resolve: {
+    tsconfigPaths: true
+  },
 })
