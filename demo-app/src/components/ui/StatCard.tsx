@@ -1,16 +1,10 @@
+type Props = { label: string; value: string | number };
 
-type StatCardProps = {
-  label: string;
-  value: string | number;
-};
-
-export function StatCard({ label, value }: StatCardProps) {
+export function StatCard({ label, value }: Props) {
   return (
     <div className="stat-card">
-      <div className="text-[11px] uppercase tracking-[0.25em] text-muted">
-        {label}
-      </div>
-      <div className="mt-1 text-sm font-medium text-text">{value}</div>
+      <div className="kicker mb-1">{label}</div>
+      <div className="text-sm font-medium text-[--color-text]">{value}</div>
     </div>
   );
 }

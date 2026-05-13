@@ -1,114 +1,215 @@
 @import "tailwindcss";
 
+/* ─── Design tokens ──────────────────────────────────────────────────── */
 @theme {
-  --color-bg: #0b0d10;
-  --color-surface: #111317;
-  --color-panel: #171a21;
-  --color-panel-strong: #1f2430;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-text: #f5f5f5;
-  --color-muted: #9ca3af;
+  /* Backgrounds */
+  --color-bg:           #080c12;
+  --color-surface:      #0d1117;
+  --color-panel:        #111820;
+  --color-panel-strong: #18222e;
 
-  --color-primary: #ffb703;
-  --color-primary-soft: #f48c06;
-  --color-accent: #2196f3;
-  --color-accent-soft: #736ced;
-  --color-danger: #fb7185;
+  /* Borders */
+  --color-border:       rgba(56, 139, 253, 0.12);
+  --color-border-soft:  rgba(255, 255, 255, 0.06);
+
+  /* Text */
+  --color-text:         #e8edf3;
+  --color-muted:        #6b7a8d;
+
+  /* Brand — electric cyan */
+  --color-primary:      #00d9ff;
+  --color-primary-dim:  #0096b4;
+
+  /* Accent — violet */
+  --color-accent:       #7c6eff;
+  --color-accent-dim:   #5648cc;
+
+  /* Swap highlight colours */
+  --color-swap-a:       #00d9ff;   /* first element  */
+  --color-swap-b:       #ff5d7a;   /* second element */
+
+  /* Danger / error */
+  --color-danger:       #ff5d7a;
 }
 
-html,
-body,
-#root {
+/* ─── Base ───────────────────────────────────────────────────────────── */
+html, body, #root {
   height: 100%;
 }
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at top, rgba(245, 158, 11, 0.1), transparent 35%),
-    linear-gradient(180deg, #0b0d10 0%, #090a0d 100%);
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0, 217, 255, 0.07), transparent),
+    radial-gradient(ellipse 50% 30% at 90% 110%, rgba(124, 110, 255, 0.06), transparent);
   color: var(--color-text);
+  font-family: 'DM Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
+/* ─── Component abstractions ─────────────────────────────────────────── */
+/*
+   Only abstract patterns that repeat 3+ times with 3+ utilities.
+   Single-utility or 2-utility combos stay inline in JSX.
+*/
 @layer components {
+
+  /* Shell / layout */
   .app-shell {
-    @apply rounded-3xl border border-border bg-surface/75 shadow-2xl shadow-black/20 backdrop-blur;
+    @apply rounded-2xl border border-[--color-border] bg-[--color-surface]/80
+           shadow-2xl shadow-black/40 backdrop-blur-sm;
   }
 
+  /* Cards */
   .panel-card {
-    @apply rounded-3xl border border-border bg-panel/70;
+    @apply rounded-2xl border border-[--color-border-soft] bg-[--color-panel];
   }
 
-  .section-kicker {
-    @apply text-sm font-semibold uppercase tracking-[0.25em] text-text/80;
+  /* Typography */
+  .kicker {
+    @apply text-[10px] font-semibold uppercase tracking-[0.3em] text-[--color-muted];
   }
 
-  .field-label {
-    @apply text-xs uppercase tracking-[0.22em] text-muted;
-  }
-
+  /* Form inputs */
   .input-base {
-    @apply rounded-xl border border-border bg-bg/70 px-4 py-3 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary;
+    @apply w-full rounded-lg border border-[--color-border] bg-[--color-bg]/80
+           px-3 py-2.5 text-sm text-[--color-text] outline-none transition-colors
+           placeholder:text-[--color-muted]
+           focus:border-[--color-primary]/60 focus:ring-1 focus:ring-[--color-primary]/20;
   }
 
-  .btn-base {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm transition disabled:cursor-not-allowed disabled:opacity-50;
+  /* Buttons — base geometry + behaviour */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]
+           transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40
+           select-none;
   }
+  .btn-pill  { @apply rounded-full; }
 
-  .btn-rounded {
-    @apply rounded-xl;
-  }
-
-  .btn-pill {
-    @apply rounded-full;
-  }
-
+  /* Button variants */
   .btn-neutral {
-    @apply border border-border bg-panel-strong/90 text-text
-          hover:brightness-175;
+    @apply border border-[--color-border] bg-[--color-panel-strong]/80
+           text-[--color-text]/60 hover:border-[--color-primary]/30
+           hover:bg-[--color-panel-strong] hover:text-[--color-text];
   }
-
+  /* Active / selected state — solid fill so it's unmistakably "pressed" */
   .btn-active {
-    @apply border-transparent bg-primary font-semibold text-bg hover:bg-primary-soft;
+    border-color: var(--color-primary);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 25%, var(--color-panel-strong)),
+      color-mix(in srgb, var(--color-primary) 15%, var(--color-panel-strong))
+    );
+    color: var(--color-primary);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-primary) 40%, transparent),
+      0 0 12px color-mix(in srgb, var(--color-primary) 20%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-primary) 20%, transparent);
   }
-
+  .btn-active:hover {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 32%, var(--color-panel-strong)),
+      color-mix(in srgb, var(--color-primary) 22%, var(--color-panel-strong))
+    );
+  }
   .btn-accent {
-    @apply border-transparent bg-accent font-semibold text-bg hover:bg-accent-soft;
+    @apply border border-[--color-accent]/50 bg-[--color-accent]/15
+           text-[--color-accent] hover:bg-[--color-accent]/25;
   }
 
+  /* Stat card */
   .stat-card {
-    @apply rounded-2xl border border-border bg-panel/70 px-4 py-3 shadow-sm shadow-black/20;
+    @apply rounded-xl border border-[--color-border-soft] bg-[--color-panel]
+           px-4 py-3;
   }
 
-  .visualizer-shell {
-    @apply relative overflow-hidden rounded-3xl border border-border bg-panel/80 p-4 shadow-2xl shadow-black/20;
+  /* Visualizer */
+  .viz-shell {
+    @apply relative overflow-hidden rounded-2xl border border-[--color-border]
+           bg-[--color-panel] shadow-xl shadow-black/30;
+  }
+  .viz-stage {
+    @apply relative overflow-hidden rounded-xl border border-[--color-border-soft]
+           bg-[--color-bg]/60 px-2 pb-2 pt-2;
   }
 
-  .visualizer-stage {
-    @apply relative h-104 overflow-hidden rounded-2xl border border-border bg-bg/40 px-3 pb-3 pt-3;
-  }
-
-  .visualizer-empty {
-    @apply flex h-full w-full items-center justify-center text-sm text-muted;
-  }
-
-  .visualizer-dot {
-    @apply h-2 w-2 rounded-full bg-text/90 shadow-lg shadow-white/20;
-  }
-
+  /* Bars */
   .bar-default {
-      @apply bg-linear-to-t from-primary-soft to-primary;
+    background: linear-gradient(
+      to top,
+      var(--color-accent-dim) 0%,
+      var(--color-accent) 100%
+    );
+    opacity: 0.6;
+  }
+  .bar-swap-a {
+    background: linear-gradient(
+      to top,
+      var(--color-primary-dim) 0%,
+      var(--color-primary) 80%,
+      white 100%
+    );
+    opacity: 1;
+    box-shadow: 0 0 16px color-mix(in srgb, var(--color-swap-a) 70%, transparent),
+                0 0 4px  var(--color-swap-a);
+  }
+  .bar-swap-b {
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-swap-b) 80%, #300) 0%,
+      var(--color-swap-b) 70%,
+      color-mix(in srgb, var(--color-swap-b) 80%, white) 100%
+    );
+    opacity: 1;
+    box-shadow: 0 0 16px color-mix(in srgb, var(--color-swap-b) 70%, transparent),
+                0 0 4px  var(--color-swap-b);
   }
 
-  .bar-active-a {
-    background: linear-gradient(to top, var(--color-accent-soft), #fef3c7);
+  /* Range input — gradient track via a custom property trick */
+  input[type="range"].gradient-track {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
   }
-
-  .bar-active-b {
-    background: linear-gradient(to top, var(--color-danger), #fb7185, #fecdd3);
+  input[type="range"].gradient-track::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: linear-gradient(
+      90deg,
+      var(--color-accent-dim),
+      var(--color-accent)
+    );
+  }
+  input[type="range"].gradient-track::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: linear-gradient(
+      90deg,
+      var(--color-accent-dim),
+      var(--color-accent)
+    );
+  }
+  input[type="range"].gradient-track::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-top: -5px;
+    background: var(--color-primary);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-primary) 60%, transparent);
+    cursor: pointer;
+  }
+  input[type="range"].gradient-track::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-primary);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-primary) 60%, transparent);
+    cursor: pointer;
   }
 }

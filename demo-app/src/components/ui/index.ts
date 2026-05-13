@@ -1,5 +1,5 @@
-export { Button } from "./Button"
-export { TextField } from "./TextField";
+export { Button }     from "./Button";
+export { Card }       from "./Card";
+export { TextField }  from "./TextField";
 export { RangeField } from "./RangeField";
-export { StatCard } from "./StatCard";
-export { Card } from "./Card";
+export { StatCard }   from "./StatCard";

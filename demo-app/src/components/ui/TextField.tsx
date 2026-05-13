@@ -1,17 +1,13 @@
 import type { InputHTMLAttributes } from "react";
 import { cx } from "@/lib/cx";
 
-type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
-};
+type Props = InputHTMLAttributes<HTMLInputElement> & { label: string };
 
-export function TextField({ label, className, ...props }: TextFieldProps) {
+export function TextField({ label, className, ...props }: Props) {
   return (
     <label className="flex flex-col gap-2">
-      <span className="field-label">{label}</span>
+      <span className="kicker">{label}</span>
       <input className={cx("input-base", className)} {...props} />
     </label>
   );
 }
-
-

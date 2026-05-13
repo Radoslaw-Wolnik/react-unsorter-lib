@@ -1,309 +1,179 @@
-import { useEffect, useState } from "react";
-import { Algorithm, unsort, unsortSteps, type UnsortTrace } from "react-unsorter-lib";
+import { Algorithm } from "react-unsorter-lib";
 import { RotateCcw } from "lucide-react";
+
+import { useUnsortPlayer } from "@/hooks/useUnsortPlayer";
 import Visualizer from "./components/Visualizer";
 import { Button, Card, RangeField, StatCard, TextField } from "./components/ui";
 
 const ALGORITHMS = [
-  { value: Algorithm.Random, label: "Random" },
+  { value: Algorithm.Random,    label: "Random"    },
   { value: Algorithm.LastFirst, label: "LastFirst" },
   { value: Algorithm.Recursive, label: "Recursive" },
-  { value: Algorithm.Mask, label: "Mask" },
+  { value: Algorithm.Mask,      label: "Mask"      },
 ] as const;
 
-function makeSortedArray(size = 48) {
-  return Array.from({ length: size }, (_, i) => i + 1);
-}
-
-function parseSeed(raw: string): number | undefined {
-  const trimmed = raw.trim();
-  if (!trimmed) return undefined;
-
-  const n = Number(trimmed);
-  return Number.isFinite(n) ? n : undefined;
-}
-
-function parseArraySize(raw: string): number {
-  const n = Number(raw);
-  if (!Number.isFinite(n)) return 48;
-  return Math.max(1, Math.min(200, Math.trunc(n)));
-}
-
-function swapCopy(arr: number[], i: number, j: number) {
-  const next = [...arr];
-  [next[i], next[j]] = [next[j], next[i]];
-  return next;
-}
-
 export default function App() {
-  const [mode, setMode] = useState<"instant" | "trace">("instant");
-  const [algorithm, setAlgorithm] = useState<Algorithm>(Algorithm.Random);
-  const [seedText, setSeedText] = useState("");
-  const [arraySizeText, setArraySizeText] = useState("48");
-
-  const arraySize = parseArraySize(arraySizeText);
-
-  const [data, setData] = useState<number[]>(() => makeSortedArray(arraySize));
-  const [trace, setTrace] = useState<UnsortTrace | null>(null);
-  const [stepIndex, setStepIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(55);
-  const [activeIndices, setActiveIndices] = useState<[number, number] | null>(null);
-  const [startingData, setStartingData] = useState<number[] | null>(null);
-
-  const seed = parseSeed(seedText);
-  const playbackDelayMs = Math.max(50, 1050 - playbackSpeed * 10);
-
-  useEffect(() => {
-    if (!playing || !trace) return;
-
-    if (stepIndex >= trace.steps.length) {
-      setData(Array.from(trace.result));
-      setPlaying(false);
-      setActiveIndices(null);
-      return;
-    }
-
-    const id = window.setTimeout(() => {
-      const step = trace.steps[stepIndex];
-      setData((prev) => swapCopy(prev, step.i, step.j));
-      setActiveIndices([step.i, step.j]);
-      setStepIndex((s) => s + 1);
-    }, playbackDelayMs);
-
-    return () => window.clearTimeout(id);
-  }, [playing, trace, stepIndex, playbackDelayMs]);
-
-  function clearTraceState() {
-    setTrace(null);
-    setStepIndex(0);
-    setPlaying(false);
-    setActiveIndices(null);
-    setStartingData(null);
-  }
-
-  function regenerateArray(nextSize: number) {
-    setData(makeSortedArray(nextSize));
-    clearTraceState();
-  }
-
-  function handleArraySizeChange(raw: string) {
-    const digits = raw.replace(/[^\d]/g, "");
-    setArraySizeText(digits);
-
-    if (digits === "") return;
-    regenerateArray(parseArraySize(digits));
-  }
-
-  function sortToFreshArray() {
-    regenerateArray(arraySize);
-  }
-
-  function replayTrace() {
-    if (!startingData) return;
-
-    setData([...startingData]);
-    setStepIndex(0);
-    setActiveIndices(null);
-    setPlaying(true);
-  }
-
-  function runUnsort() {
-    const options = { algorithm, seed };
-
-    if (mode === "instant") {
-      clearTraceState();
-      const result = unsort(data, options);
-      setData(Array.from(result));
-      return;
-    }
-
-    const source = [...data];
-    const result = unsortSteps(source, options);
-
-    setStartingData(source);
-    setTrace(result);
-    setData(source);
-    setStepIndex(0);
-    setActiveIndices(null);
-    setPlaying(true);
-  }
-
-  function stepOnce() {
-    if (!trace || stepIndex >= trace.steps.length) return;
-
-    setPlaying(false);
-
-    const step = trace.steps[stepIndex];
-    setData((prev) => swapCopy(prev, step.i, step.j));
-    setActiveIndices([step.i, step.j]);
-    setStepIndex((s) => s + 1);
-  }
-
-  const totalSteps = trace?.steps.length ?? 0;
-  const progress = totalSteps === 0 ? 0 : Math.min(100, (stepIndex / totalSteps) * 100);
-
-  const nextStep =
-    trace && stepIndex < trace.steps.length ? trace.steps[stepIndex] : null;
+  const p = useUnsortPlayer();
 
   return (
-    <div className="min-h-screen bg-transparent text-text">
-      <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
-        <div className="app-shell">
-          <header className="flex flex-col gap-4 border-b border-border p-6">
-            <div>
-              <p className="text-xs uppercase tracking-[0.32em] text-primary-soft/80">
-                Rust + WASM + React
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-                Unsort Visualizer
-              </h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
-                A playful learning project that turns a Rust WebAssembly package
-                into a small React demo. Switch between instant unsorting and a
-                step-by-step trace mode that shows each swap as it happens.
+    /* Full viewport — no scrolling on the outer page */
+    <div className="flex h-screen flex-col overflow-hidden bg-transparent text-[--color-text]">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-hidden px-4 py-4 md:px-6">
+        <div className="app-shell flex flex-1 flex-col overflow-hidden">
+
+          {/* ── Header — fixed height ── */}
+          <header className="shrink-0 border-b border-[--color-border] px-6 py-4">
+            <div className="flex items-baseline justify-between">
+              <div>
+                <p className="kicker text-[--color-primary]/60">Rust · WASM · React</p>
+                <h1 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
+                  Unsort Visualizer
+                </h1>
+              </div>
+              <p className="hidden max-w-sm text-xs leading-5 text-[--color-muted] md:block">
+                Instant mode unsorts immediately; step-by-step trace mode animates each swap.
               </p>
             </div>
           </header>
 
-          <div className="mt-6 grid gap-6 p-6 pt-0 xl:grid-cols-[minmax(0,1.7fr)_360px]">
-            <div className="space-y-6">
-              <Visualizer
-                data={data}
-                activeIndices={activeIndices}
-                mode={mode}
-                stepIndex={stepIndex}
-                totalSteps={totalSteps}
-                playing={playing}
-                nextStep={nextStep}
-                progress={progress}
-              />
+          {/* ── Main layout — fills remaining height ── */}
+          <div className="grid min-h-0 flex-1 gap-4 p-4 xl:grid-cols-[1fr_300px]">
 
-              <div className="grid gap-3 sm:grid-cols-3">
+            {/* Left column — visualizer + stats */}
+            <div className="flex min-h-0 flex-col gap-3">
+              {/* Visualizer fills available space */}
+              <div className="min-h-0 flex-1">
+                <Visualizer
+                  data={p.data}
+                  activeIndices={p.activeIndices}
+                  mode={p.mode}
+                  stepIndex={p.stepIndex}
+                  totalSteps={p.totalSteps}
+                  playing={p.playing}
+                  nextStep={p.nextStep}
+                  progress={p.progress}
+                />
+              </div>
+
+              {/* Stat row — fixed height at bottom of left col */}
+              <div className="grid shrink-0 grid-cols-3 gap-3">
                 <StatCard
                   label="Mode"
-                  value={mode === "instant" ? "Instant" : "Step-by-step"}
+                  value={p.mode === "instant" ? "Instant" : "Step-by-step"}
                 />
                 <StatCard
-                  label="Current algorithm"
-                  value={
-                    ALGORITHMS.find((a) => a.value === algorithm)?.label ?? "Random"
-                  }
+                  label="Algorithm"
+                  value={ALGORITHMS.find((a) => a.value === p.algorithm)?.label ?? "Random"}
                 />
                 <StatCard
-                  label="Current step"
+                  label="Step"
                   value={
-                    mode === "trace"
-                      ? `${Math.min(stepIndex, totalSteps)} / ${totalSteps}`
+                    p.mode === "trace"
+                      ? `${Math.min(p.stepIndex, p.totalSteps)} / ${p.totalSteps}`
                       : "—"
                   }
                 />
               </div>
             </div>
 
-            <aside className="space-y-6">
-              <Card className="p-5">
-                <h2 className="section-kicker">Controls</h2>
+            {/* Right sidebar — scrollable internally */}
+            <aside className="flex min-h-0 flex-col gap-3 overflow-y-auto">
 
-                <div className="mt-5 space-y-5">
-                  <div>
-                    <p className="field-label mb-2">Mode</p>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        shape="pill"
-                        active={mode === "instant"}
-                        onClick={() => setMode("instant")}
-                      >
-                        Instant
-                      </Button>
-                      <Button
-                        shape="pill"
-                        active={mode === "trace"}
-                        onClick={() => setMode("trace")}
-                      >
-                        Step-by-step
-                      </Button>
-                    </div>
+              {/* Controls card */}
+              <Card className="shrink-0 p-4">
+                <p className="kicker mb-3">Controls</p>
+
+                {/* Mode toggle */}
+                <div className="mb-3">
+                  <p className="kicker mb-1.5 text-[--color-muted]/60">Mode</p>
+                  <div className="flex gap-2">
+                    <Button shape="pill" active={p.mode === "instant"} onClick={() => p.setMode("instant")}>
+                      Instant
+                    </Button>
+                    <Button shape="pill" active={p.mode === "trace"} onClick={() => p.setMode("trace")}>
+                      Step-by-step
+                    </Button>
                   </div>
+                </div>
 
-                  <div>
-                    <p className="field-label mb-2">Algorithm</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {ALGORITHMS.map((item) => (
-                        <Button
-                          key={item.label}
-                          active={algorithm === item.value}
-                          onClick={() => setAlgorithm(item.value)}
-                        >
-                          {item.label}
-                        </Button>
-                      ))}
-                    </div>
+                {/* Algorithm grid */}
+                <div className="mb-3">
+                  <p className="kicker mb-1.5 text-[--color-muted]/60">Algorithm</p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {ALGORITHMS.map((item) => (
+                      <Button
+                        key={item.label}
+                        active={p.algorithm === item.value}
+                        onClick={() => p.setAlgorithm(item.value)}
+                      >
+                        {item.label}
+                      </Button>
+                    ))}
                   </div>
+                </div>
 
+                <div className="mb-3">
                   <TextField
                     label="Array size"
                     inputMode="numeric"
                     pattern="[0-9]*"
                     placeholder="48"
-                    value={arraySizeText}
-                    onChange={(e) => handleArraySizeChange(e.target.value)}
+                    value={p.arraySizeText}
+                    onChange={(e) => p.handleArraySizeChange(e.target.value)}
                   />
+                </div>
 
+                <div className="mb-4">
                   <TextField
                     label="Seed"
                     inputMode="numeric"
                     placeholder="optional"
-                    value={seedText}
-                    onChange={(e) => setSeedText(e.target.value)}
+                    value={p.seedText}
+                    onChange={(e) => p.setSeedText(e.target.value)}
                   />
+                </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    <Button variant="accent" onClick={runUnsort}>
-                      {mode === "instant" ? "Unsort" : "Generate trace"}
-                    </Button>
-
-                    <Button onClick={sortToFreshArray}>
-                      <RotateCcw className="h-4 w-4" />
-                      Sort
-                    </Button>
-                  </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="accent" onClick={p.runUnsort}>
+                    {p.mode === "instant" ? "Unsort" : "Generate trace"}
+                  </Button>
+                  <Button onClick={p.sortToFreshArray}>
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    Reset
+                  </Button>
                 </div>
               </Card>
 
-              {mode === "trace" && (
-                <Card className="p-5">
-                  <h2 className="section-kicker">Trace controls</h2>
+              {/* Trace controls card */}
+              {p.mode === "trace" && (
+                <Card className="shrink-0 p-4">
+                  <p className="kicker mb-3">Trace controls</p>
 
-                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <div className="mb-4 flex flex-wrap gap-2">
                     <Button
                       variant="accent"
-                      onClick={() => setPlaying((p) => !p)}
-                      disabled={totalSteps === 0}
+                      onClick={() => p.setPlaying(!p.playing)}
+                      disabled={p.totalSteps === 0}
                     >
-                      {playing ? "Pause" : "Play"}
+                      {p.playing ? "Pause" : "Play"}
                     </Button>
-
-                    <Button onClick={stepOnce} disabled={totalSteps === 0}>
+                    <Button onClick={p.stepOnce} disabled={p.totalSteps === 0}>
                       Step once
                     </Button>
-
-                    <Button onClick={replayTrace} disabled={!startingData}>
-                      Replay trace
+                    <Button onClick={p.replayTrace} disabled={p.totalSteps === 0}>
+                      Replay
                     </Button>
                   </div>
 
-                  <div className="mt-5">
-                    <RangeField
-                      label="Playback speed"
-                      valueLabel={`${playbackSpeed}/100`}
-                      min={1}
-                      max={100}
-                      step={1}
-                      value={playbackSpeed}
-                      onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
-                    />
-                  </div>
+                  <RangeField
+                    label="Playback speed"
+                    valueLabel={`${p.playbackSpeed}/100`}
+                    min={1}
+                    max={100}
+                    step={1}
+                    value={p.playbackSpeed}
+                    onChange={(e) => p.setPlaybackSpeed(Number(e.target.value))}
+                  />
                 </Card>
               )}
             </aside>
@@ -313,3 +183,4 @@ export default function App() {
     </div>
   );
 }
+
