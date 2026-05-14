@@ -2,34 +2,38 @@
 
 /* ─── Design tokens ──────────────────────────────────────────────────── */
 @theme {
-  /* Backgrounds */
-  --color-bg:           #080c12;
-  --color-surface:      #0d1117;
-  --color-panel:        #111820;
-  --color-panel-strong: #18222e;
+  /*
+    Warm-slate palette.
+    Backgrounds: dark grey with a slight warm undertone — not blue-black.
+    Text: warm off-white, never pure white.
+    Accents: desaturated and muted — present but not glaring.
+  */
 
-  /* Borders */
-  --color-border:       rgba(56, 139, 253, 0.12);
-  --color-border-soft:  rgba(255, 255, 255, 0.06);
+  /* Backgrounds — warm dark greys */
+  --color-bg:           #1a1a20;
+  --color-surface:      #1f1f27;
+  --color-panel:        #26262f;
+  --color-panel-strong: #2e2e38;
 
-  /* Text */
-  --color-text:         #e8edf3;
-  --color-muted:        #6b7a8d;
+  /* Borders — warm-white, very subtle */
+  --color-border:       rgba(220, 210, 200, 0.09);
+  --color-border-soft:  rgba(220, 210, 200, 0.05);
 
-  /* Brand — electric cyan */
-  --color-primary:      #00d9ff;
-  --color-primary-dim:  #0096b4;
+  /* Text — warm off-whites */
+  --color-text:         #d4d0cb;
+  --color-muted:        #7a7570;
 
-  /* Accent — violet */
-  --color-accent:       #7c6eff;
-  --color-accent-dim:   #5648cc;
+  /* Primary — soft amber/gold, not neon */
+  --color-primary:      #c8975a;
+  --color-primary-dim:  #9a6e3a;
 
-  /* Swap highlight colours */
-  --color-swap-a:       #00d9ff;   /* first element  */
-  --color-swap-b:       #ff5d7a;   /* second element */
+  /* Accent — muted slate-blue for bars & progress */
+  --color-accent:       #7a90b8;
+  --color-accent-dim:   #4e637f;
 
-  /* Danger / error */
-  --color-danger:       #ff5d7a;
+  /* Swap highlight colours — warm & readable, not neon */
+  --color-swap-a:       #6db3a8;   /* first  — desaturated teal  */
+  --color-swap-b:       #c47a7a;   /* second — muted rose        */
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────── */
@@ -41,8 +45,8 @@ body {
   margin: 0;
   background-color: var(--color-bg);
   background-image:
-    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0, 217, 255, 0.07), transparent),
-    radial-gradient(ellipse 50% 30% at 90% 110%, rgba(124, 110, 255, 0.06), transparent);
+    radial-gradient(ellipse 90% 45% at 50% -5%, rgba(200, 151, 90, 0.05), transparent),
+    radial-gradient(ellipse 60% 35% at 95% 105%, rgba(122, 144, 184, 0.04), transparent);
   color: var(--color-text);
   font-family: 'DM Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
 }
@@ -58,158 +62,221 @@ body {
 
   /* Shell / layout */
   .app-shell {
-    @apply rounded-2xl border border-[--color-border] bg-[--color-surface]/80
-           shadow-2xl shadow-black/40 backdrop-blur-sm;
+    @apply rounded-2xl border border-[--color-border] bg-[--color-surface]
+           shadow-xl shadow-black/30;
   }
 
   /* Cards */
   .panel-card {
-    @apply rounded-2xl border border-[--color-border-soft] bg-[--color-panel];
+    @apply rounded-xl border border-[--color-border-soft] bg-[--color-panel];
   }
 
   /* Typography */
   .kicker {
-    @apply text-[10px] font-semibold uppercase tracking-[0.3em] text-[--color-muted];
+    @apply text-[10px] font-semibold uppercase tracking-[0.28em] text-[--color-muted];
   }
 
   /* Form inputs */
   .input-base {
-    @apply w-full rounded-lg border border-[--color-border] bg-[--color-bg]/80
+    @apply w-full rounded-lg border border-[--color-border] bg-[--color-bg]/70
            px-3 py-2.5 text-sm text-[--color-text] outline-none transition-colors
            placeholder:text-[--color-muted]
-           focus:border-[--color-primary]/60 focus:ring-1 focus:ring-[--color-primary]/20;
+           focus:border-[--color-primary]/50 focus:ring-1 focus:ring-[--color-primary]/10;
   }
 
-  /* Buttons — base geometry + behaviour */
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
+
   .btn {
     @apply inline-flex items-center justify-center gap-2
-           rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]
-           transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40
+           rounded-lg px-4 py-2 text-[11px] font-semibold uppercase tracking-widest
+           transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-35
            select-none;
   }
-  .btn-pill  { @apply rounded-full; }
+  .btn-pill { @apply rounded-full; }
 
-  /* Button variants */
+  /* Resting — softly inset, understated */
   .btn-neutral {
-    @apply border border-[--color-border] bg-[--color-panel-strong]/80
-           text-[--color-text]/60 hover:border-[--color-primary]/30
-           hover:bg-[--color-panel-strong] hover:text-[--color-text];
+    border: 1px solid var(--color-border);
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-panel-strong) 60%, var(--color-panel)) 0%,
+        var(--color-panel-strong) 100%
+      );
+    color: color-mix(in srgb, var(--color-text) 65%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.04),
+      inset 0 -1px 0 rgba(0,0,0,0.15),
+      0 1px 2px rgba(0,0,0,0.2);
   }
-  /* Active / selected state — solid fill so it's unmistakably "pressed" */
+  .btn-neutral:hover:not(:disabled) {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-panel-strong) 80%, var(--color-panel)) 0%,
+        color-mix(in srgb, var(--color-panel-strong) 95%, #fff) 100%
+      );
+    color: var(--color-text);
+    border-color: rgba(220, 210, 200, 0.14);
+  }
+
+  /* Active / selected — warm amber tint, clearly selected */
   .btn-active {
-    border-color: var(--color-primary);
-    background: linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--color-primary) 25%, var(--color-panel-strong)),
-      color-mix(in srgb, var(--color-primary) 15%, var(--color-panel-strong))
-    );
+    border: 1px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-primary) 18%, var(--color-panel-strong)) 0%,
+        color-mix(in srgb, var(--color-primary) 11%, var(--color-panel-strong)) 100%
+      );
     color: var(--color-primary);
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--color-primary) 40%, transparent),
-      0 0 12px color-mix(in srgb, var(--color-primary) 20%, transparent),
-      inset 0 1px 0 color-mix(in srgb, var(--color-primary) 20%, transparent);
+      inset 0 1px 0 color-mix(in srgb, var(--color-primary) 15%, transparent),
+      inset 0 -1px 0 rgba(0,0,0,0.12),
+      0 0 0 1px color-mix(in srgb, var(--color-primary) 18%, transparent),
+      0 0 10px color-mix(in srgb, var(--color-primary) 10%, transparent);
   }
-  .btn-active:hover {
-    background: linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--color-primary) 32%, var(--color-panel-strong)),
-      color-mix(in srgb, var(--color-primary) 22%, var(--color-panel-strong))
-    );
-  }
-  .btn-accent {
-    @apply border border-[--color-accent]/50 bg-[--color-accent]/15
-           text-[--color-accent] hover:bg-[--color-accent]/25;
+  .btn-active:hover:not(:disabled) {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-primary) 24%, var(--color-panel-strong)) 0%,
+        color-mix(in srgb, var(--color-primary) 16%, var(--color-panel-strong)) 100%
+      );
   }
 
-  /* Stat card */
+  /* Accent — slate-blue, for primary actions */
+  .btn-accent {
+    border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-accent) 20%, var(--color-panel-strong)) 0%,
+        color-mix(in srgb, var(--color-accent) 13%, var(--color-panel-strong)) 100%
+      );
+    color: color-mix(in srgb, var(--color-accent) 90%, var(--color-text));
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-accent) 12%, transparent),
+      inset 0 -1px 0 rgba(0,0,0,0.12),
+      0 1px 3px rgba(0,0,0,0.2);
+  }
+  .btn-accent:hover:not(:disabled) {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-accent) 28%, var(--color-panel-strong)) 0%,
+        color-mix(in srgb, var(--color-accent) 20%, var(--color-panel-strong)) 100%
+      );
+    border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+
+  /* ── Stat card ────────────────────────────────────────────────────────── */
   .stat-card {
     @apply rounded-xl border border-[--color-border-soft] bg-[--color-panel]
            px-4 py-3;
   }
 
-  /* Visualizer */
+  /* ── Visualizer ───────────────────────────────────────────────────────── */
   .viz-shell {
     @apply relative overflow-hidden rounded-2xl border border-[--color-border]
-           bg-[--color-panel] shadow-xl shadow-black/30;
+           bg-[--color-panel] shadow-lg shadow-black/20;
   }
   .viz-stage {
     @apply relative overflow-hidden rounded-xl border border-[--color-border-soft]
-           bg-[--color-bg]/60 px-2 pb-2 pt-2;
+           bg-[--color-bg] px-2 pb-2 pt-2;
   }
 
-  /* Bars */
+  /* ── Bars ─────────────────────────────────────────────────────────────── */
+
+  /* Default — muted slate blue, quiet presence */
   .bar-default {
     background: linear-gradient(
       to top,
-      var(--color-accent-dim) 0%,
-      var(--color-accent) 100%
+      var(--color-accent-dim)  0%,
+      var(--color-accent)      70%,
+      color-mix(in srgb, var(--color-accent) 70%, var(--color-text)) 100%
     );
-    opacity: 0.6;
+    opacity: 0.55;
+    border-radius: 2px 2px 0 0;
   }
+
+  /* Swap A — warm teal, clearly different from default */
   .bar-swap-a {
     background: linear-gradient(
       to top,
-      var(--color-primary-dim) 0%,
-      var(--color-primary) 80%,
-      white 100%
+      color-mix(in srgb, var(--color-swap-a) 70%, #000) 0%,
+      var(--color-swap-a)      65%,
+      color-mix(in srgb, var(--color-swap-a) 55%, #fff) 100%
     );
     opacity: 1;
-    box-shadow: 0 0 16px color-mix(in srgb, var(--color-swap-a) 70%, transparent),
-                0 0 4px  var(--color-swap-a);
+    border-radius: 2px 2px 0 0;
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--color-swap-a) 35%, transparent),
+      0 0  4px color-mix(in srgb, var(--color-swap-a) 55%, transparent);
   }
+
+  /* Swap B — muted rose, warm contrast to teal */
   .bar-swap-b {
     background: linear-gradient(
       to top,
-      color-mix(in srgb, var(--color-swap-b) 80%, #300) 0%,
-      var(--color-swap-b) 70%,
-      color-mix(in srgb, var(--color-swap-b) 80%, white) 100%
+      color-mix(in srgb, var(--color-swap-b) 75%, #1a0808) 0%,
+      var(--color-swap-b)      65%,
+      color-mix(in srgb, var(--color-swap-b) 55%, #fff) 100%
     );
     opacity: 1;
-    box-shadow: 0 0 16px color-mix(in srgb, var(--color-swap-b) 70%, transparent),
-                0 0 4px  var(--color-swap-b);
+    border-radius: 2px 2px 0 0;
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--color-swap-b) 35%, transparent),
+      0 0  4px color-mix(in srgb, var(--color-swap-b) 55%, transparent);
   }
 
-  /* Range input — gradient track via a custom property trick */
+  /* ── Range input — gradient track ────────────────────────────────────── */
   input[type="range"].gradient-track {
     appearance: none;
     -webkit-appearance: none;
     background: transparent;
   }
   input[type="range"].gradient-track::-webkit-slider-runnable-track {
-    height: 4px;
+    height: 3px;
     border-radius: 9999px;
     background: linear-gradient(
       90deg,
       var(--color-accent-dim),
       var(--color-accent)
     );
+    opacity: 0.7;
   }
   input[type="range"].gradient-track::-moz-range-track {
-    height: 4px;
+    height: 3px;
     border-radius: 9999px;
     background: linear-gradient(
       90deg,
       var(--color-accent-dim),
       var(--color-accent)
     );
+    opacity: 1;
   }
   input[type="range"].gradient-track::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
     border-radius: 50%;
     margin-top: -5px;
     background: var(--color-primary);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--color-primary) 60%, transparent);
+    box-shadow:
+      0 0 0 2px var(--color-primary),
+      0 1px 3px rgba(0,0,0,0.4);
     cursor: pointer;
   }
   input[type="range"].gradient-track::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
     border-radius: 50%;
     border: none;
     background: var(--color-primary);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--color-primary) 60%, transparent);
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--color-primary) 20%, transparent),
+      0 1px 3px rgba(0,0,0,0.4);
     cursor: pointer;
   }
 }

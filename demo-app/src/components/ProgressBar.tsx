@@ -28,14 +28,15 @@ export function ProgressBar({ stepIndex, totalSteps, nextStep, progress }: Props
           <span className="text-[--color-primary]/50">done</span>
         )}
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-[--color-bg]/60">
+      <div className="h-1.5 overflow-hidden rounded-full bg-[--color-bg]">
         <div
           className="h-full rounded-full"
           style={{
             width: `${clamped}%`,
             background:
-              "linear-gradient(90deg, var(--color-accent-dim), var(--color-accent))",
+              "linear-gradient(90deg, var(--color-accent-dim), var(--color-accent) 80%, color-mix(in srgb, var(--color-accent) 70%, var(--color-text)) 100%)",
             transition: "width 80ms linear",
+            opacity: 0.85,
           }}
         />
       </div>
