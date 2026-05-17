@@ -19,19 +19,19 @@ export default function App() {
     /* Full viewport — no scrolling on the outer page */
     <div className="flex h-screen flex-col overflow-hidden bg-transparent text-[--color-text]">
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-hidden px-4 py-4 md:px-6">
-        <div className="app-shell flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-[--color-border] bg-[--color-surface] shadow-xl shadow-black/30">
 
           {/* ── Header — fixed height ── */}
-          <header className="shrink-0 border-b border-[--color-border] px-6 py-4">
-            <div className="flex items-baseline justify-between">
+          <header className="shrink-0 border-b border-[--color-border] px-6 py-5">
+            <div className="flex items-center justify-between gap-6">
               <div>
-                <p className="kicker text-[--color-primary]/60">Rust · WASM · React</p>
-                <h1 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
+                <p className="kicker mb-1.5 text-[--color-primary-text]/60">Rust · WASM · React</p>
+                <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-[--color-text]">
                   Unsort Visualizer
                 </h1>
               </div>
-              <p className="hidden max-w-sm text-xs leading-5 text-[--color-muted] md:block">
-                Instant mode unsorts immediately; <br></br>Step-by-step trace mode animates each swap.
+              <p className="hidden max-w-xs text-[13px] leading-5 text-[--color-muted] md:block">
+                Instant mode unsorts immediately; step-by-step trace mode animates each swap.
               </p>
             </div>
           </header>

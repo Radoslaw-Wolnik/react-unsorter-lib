@@ -25,7 +25,7 @@ export default function Visualizer({
   const max = Math.max(...data, 1);
 
   return (
-    <div className="viz-shell flex h-full flex-col">
+    <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-[--color-border] bg-[--color-panel] shadow-lg shadow-black/20">
       {/* top-edge glow line */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[--color-primary]/30 to-transparent" />
 
@@ -53,7 +53,7 @@ export default function Visualizer({
       </div>
 
       {/* bar chart stage — fills remaining height */}
-      <div className="viz-stage mx-4 mb-4 flex-1">
+      <div className="relative mx-4 mb-4 flex-1 overflow-hidden rounded-xl border border-[--color-border-soft] bg-[--color-bg] p-2">
         {data.length === 0 ? (
           <div className="flex h-full w-full items-center justify-center text-sm text-[--color-muted]">
             No data yet
