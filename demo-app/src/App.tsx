@@ -26,7 +26,7 @@ export default function App() {
                 </h1>
               </div>
               <p className="hidden max-w-xs text-[13px] leading-5 text-[--color-muted] md:block">
-                Instant mode unsorts immediately; step-by-step trace mode animates each swap.
+                Instant mode unsorts immediately; <br></br>Step-by-step trace mode animates each swap.
               </p>
             </div>
           </header>
