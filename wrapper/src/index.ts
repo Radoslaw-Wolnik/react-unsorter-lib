@@ -24,7 +24,7 @@ export function unsort(
 ): Int32Array {
   const arr = input instanceof Int32Array ? input : Int32Array.from(input);
 
-  return unsortImpl(arr, options.algorithm ?? WasmAlgorithm.Random, options.seed);
+  return unsortImpl(arr, options.algorithm ?? WasmAlgorithm.FisherYates, options.seed);
 }
 
 export function unsortSteps(
@@ -32,7 +32,7 @@ export function unsortSteps(
   options: UnsortOptions = {}
 ): UnsortTrace {
   const arr = input instanceof Int32Array ? input : Int32Array.from(input);
-  const raw = unsortStepsImpl(arr, options.algorithm ?? WasmAlgorithm.Random, options.seed);
+  const raw = unsortStepsImpl(arr, options.algorithm ?? WasmAlgorithm.FisherYates, options.seed);
 
   return {
     result: Int32Array.from(raw.result),
