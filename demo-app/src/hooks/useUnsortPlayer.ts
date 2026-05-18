@@ -70,7 +70,7 @@ export interface UnsortPlayerState {
 
 export function useUnsortPlayer(): UnsortPlayerState {
   const [mode, setMode] = useState<Mode>("instant");
-  const [algorithm, setAlgorithm] = useState<Algorithm>(Algorithm.Random);
+  const [algorithm, setAlgorithm] = useState<Algorithm>(Algorithm.FisherYates);
   const [seedText, setSeedText] = useState("");
   const [arraySizeText, setArraySizeText] = useState("48");
 

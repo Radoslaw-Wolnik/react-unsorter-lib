@@ -6,10 +6,18 @@ import Visualizer from "./components/Visualizer";
 import { Button, Card, RangeField, StatCard, TextField } from "./components/ui";
 
 const ALGORITHMS = [
-  { value: Algorithm.Random,    label: "Random"    },
-  { value: Algorithm.LastFirst, label: "LastFirst" },
-  { value: Algorithm.Recursive, label: "Recursive" },
-  { value: Algorithm.Mask,      label: "Mask"      },
+  { value: Algorithm.FisherYates, label: "Fisher-Yates" },
+  { value: Algorithm.Sattolo, label: "Sattolo cycle" },
+  { value: Algorithm.Derangement, label: "Derangement" },
+  { value: Algorithm.Riffle, label: "Riffle" },
+  { value: Algorithm.InsideOut, label: "Inside-out" },
+  { value: Algorithm.Reverse, label: "Reverse" },
+  { value: Algorithm.FaroOut, label: "Faro out" },
+  { value: Algorithm.FaroIn, label: "Faro in" },
+  { value: Algorithm.BitReversal, label: "Bit reversal" },
+  { value: Algorithm.LastFirst, label: "Last-first" },
+  { value: Algorithm.Recursive, label: "Recursive halves" },
+  { value: Algorithm.Mask, label: "LCG mask" },
 ] as const;
 
 export default function App() {
@@ -63,7 +71,7 @@ export default function App() {
                 />
                 <StatCard
                   label="Algorithm"
-                  value={ALGORITHMS.find((a) => a.value === p.algorithm)?.label ?? "Random"}
+                  value={ALGORITHMS.find((a) => a.value === p.algorithm)?.label ?? "Fisher-Yates"}
                 />
                 <StatCard
                   label="Step"
@@ -183,4 +191,3 @@ export default function App() {
     </div>
   );
 }
-
