@@ -1,17 +1,23 @@
 type Props = {
-  stepIndex:  number;
+  stepIndex: number;
   totalSteps: number;
-  nextStep:   { i: number; j: number } | null;
-  progress:   number;
+  nextStep: { i: number; j: number } | null;
+  progress: number;
+  className?: string;
 };
 
-export function ProgressBar({ stepIndex, totalSteps, nextStep, progress }: Props) {
+export function ProgressBar({
+  stepIndex,
+  totalSteps,
+  nextStep,
+  progress,
+  className = "",
+}: Props) {
   const clamped = Math.max(0, Math.min(100, progress));
 
   return (
-    <div className="min-w-48">
+    <div className={`min-w-44 ${className}`}>
       <div className="mb-2 flex items-center justify-between text-[11px] text-[--color-muted]">
-        {/* step counter — monospace so numbers don't jump width */}
         <span className="font-mono tabular-nums">
           {Math.min(stepIndex, totalSteps)} / {totalSteps}
         </span>
@@ -20,7 +26,7 @@ export function ProgressBar({ stepIndex, totalSteps, nextStep, progress }: Props
             <span style={{ color: "var(--color-swap-a)" }}>
               {Math.min(nextStep.i, nextStep.j)}
             </span>
-            <span className="text-[--color-muted]">↔</span>
+            <span className="text-[--color-muted]">{"<->"}</span>
             <span style={{ color: "var(--color-swap-b)" }}>
               {Math.max(nextStep.i, nextStep.j)}
             </span>
@@ -34,7 +40,8 @@ export function ProgressBar({ stepIndex, totalSteps, nextStep, progress }: Props
           className="h-full rounded-full"
           style={{
             width: `${clamped}%`,
-            background: "linear-gradient(90deg, var(--color-accent-dim), var(--color-accent) 80%, color-mix(in srgb, var(--color-accent) 65%, var(--color-text)) 100%)",
+            background:
+              "linear-gradient(90deg, var(--color-accent-dim), var(--color-accent) 80%, color-mix(in srgb, var(--color-accent) 65%, var(--color-text)) 100%)",
             transition: "width 80ms linear",
             opacity: 0.9,
           }}

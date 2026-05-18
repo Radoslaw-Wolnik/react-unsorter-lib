@@ -25,18 +25,17 @@ export default function Visualizer({
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden rounded-2xl bg-[--color-panel] shadow-lg shadow-black/20">
-      {mode === "trace" && (
-        <div className="flex shrink-0 justify-end p-4 pb-3">
+      <div className="relative m-4 flex-1 overflow-hidden rounded-xl border border-[--color-border-soft] bg-[--color-bg] p-2">
+        {mode === "trace" && (
           <ProgressBar
+            className="pointer-events-none absolute right-3 top-3 z-10 rounded-lg border border-[--color-border-soft] bg-[--color-panel]/75 px-3 py-2 shadow-lg shadow-black/30 backdrop-blur-md"
             stepIndex={stepIndex}
             totalSteps={totalSteps}
             nextStep={nextStep}
             progress={progress}
           />
-        </div>
-      )}
+        )}
 
-      <div className="relative m-4 flex-1 overflow-hidden rounded-xl border border-[--color-border-soft] bg-[--color-bg] p-2">
         {data.length === 0 ? (
           <div className="flex h-full w-full items-center justify-center text-sm text-[--color-muted]">
             No data yet
