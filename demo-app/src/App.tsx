@@ -25,7 +25,7 @@ export default function App() {
           <header className="shrink-0 border-b border-[--color-border] px-6 py-5">
             <div className="flex items-center justify-between gap-6">
               <div>
-                <p className="kicker mb-1.5 text-[--color-primary-text]/60">Rust · WASM · React</p>
+                <p className="kicker mb-1.5 text-[--color-primary-text]/50">Rust · WASM · React</p>
                 <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-[--color-text]">
                   Unsort Visualizer
                 </h1>
