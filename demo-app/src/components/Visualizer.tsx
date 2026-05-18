@@ -1,15 +1,15 @@
-import { ProgressBar }   from "./ProgressBar";
+import { ProgressBar } from "./ProgressBar";
 import { VisualizerBar } from "./VisualizerBar";
 
 type Props = {
-  data:          number[];
+  data: number[];
   activeIndices: [number, number] | null;
-  mode:          "instant" | "trace";
-  stepIndex:     number;
-  totalSteps:    number;
-  playing:       boolean;
-  nextStep:      { i: number; j: number } | null;
-  progress:      number;
+  mode: "instant" | "trace";
+  stepIndex: number;
+  totalSteps: number;
+  playing: boolean;
+  nextStep: { i: number; j: number } | null;
+  progress: number;
 };
 
 export default function Visualizer({
@@ -18,42 +18,25 @@ export default function Visualizer({
   mode,
   stepIndex,
   totalSteps,
-  playing,
   nextStep,
   progress,
 }: Props) {
   const max = Math.max(...data, 1);
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-[--color-border] bg-[--color-panel] shadow-lg shadow-black/20">
-      {/* top-edge glow line */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[--color-primary]/30 to-transparent" />
-
-      {/* header row */}
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 p-4 pb-3">
-        <div>
-          <p className="kicker">Visualizer</p>
-          <p className="mt-1 text-xs text-[--color-muted]">
-            {mode === "instant"
-              ? "instant result"
-              : playing
-              ? "▶ playing trace"
-              : "⏸ paused trace"}
-          </p>
-        </div>
-
-        {mode === "trace" && (
+    <div className="relative flex h-full flex-col overflow-hidden rounded-2xl bg-[--color-panel] shadow-lg shadow-black/20">
+      {mode === "trace" && (
+        <div className="flex shrink-0 justify-end p-4 pb-3">
           <ProgressBar
             stepIndex={stepIndex}
             totalSteps={totalSteps}
             nextStep={nextStep}
             progress={progress}
           />
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* bar chart stage — fills remaining height */}
-      <div className="relative mx-4 mb-4 flex-1 overflow-hidden rounded-xl border border-[--color-border-soft] bg-[--color-bg] p-2">
+      <div className="relative m-4 flex-1 overflow-hidden rounded-xl border border-[--color-border-soft] bg-[--color-bg] p-2">
         {data.length === 0 ? (
           <div className="flex h-full w-full items-center justify-center text-sm text-[--color-muted]">
             No data yet
