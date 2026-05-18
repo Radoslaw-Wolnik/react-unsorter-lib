@@ -15,7 +15,6 @@ const ALGORITHMS = [
   { value: Algorithm.FaroOut, label: "Faro out" },
   { value: Algorithm.FaroIn, label: "Faro in" },
   { value: Algorithm.BitReversal, label: "Bit reversal" },
-  { value: Algorithm.LastFirst, label: "Last-first" },
   { value: Algorithm.Recursive, label: "Recursive halves" },
   { value: Algorithm.Mask, label: "LCG mask" },
 ] as const;

@@ -7,7 +7,6 @@ use algorithms::{
     faro::{FaroInUnsorter, FaroOutUnsorter},
     fisher_yates::FisherYatesUnsorter,
     inside_out::InsideOutUnsorter,
-    last_first::LastFirstUnsorter,
     mask::MaskUnsorter,
     recursive::RecursiveUnsorter,
     reverse::ReverseUnsorter,
@@ -19,11 +18,9 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub enum Algorithm {
-    Random,
     FisherYates,
     Sattolo,
     Reverse,
-    LastFirst,
     FaroOut,
     FaroIn,
     BitReversal,
@@ -36,11 +33,11 @@ pub enum Algorithm {
 
 #[wasm_bindgen]
 pub fn unsort(input: &[i32], algorithm: Option<Algorithm>, seed: Option<f64>) -> Vec<i32> {
-    let algo = algorithm.unwrap_or(Algorithm::Random);
+    let algo = algorithm.unwrap_or(Algorithm::FisherYates);
     let seed = seed.map(|s| s as u64);
 
     match algo {
-        Algorithm::Random | Algorithm::FisherYates => {
+        Algorithm::FisherYates => {
             if let Some(seed) = seed {
                 FisherYatesUnsorter::unsort_seeded(input, seed)
             } else {
@@ -55,7 +52,6 @@ pub fn unsort(input: &[i32], algorithm: Option<Algorithm>, seed: Option<f64>) ->
             }
         }
         Algorithm::Reverse => ReverseUnsorter::unsort(input),
-        Algorithm::LastFirst => LastFirstUnsorter::unsort(input),
         Algorithm::FaroOut => FaroOutUnsorter::unsort(input),
         Algorithm::FaroIn => FaroInUnsorter::unsort(input),
         Algorithm::BitReversal => BitReversalUnsorter::unsort(input),
@@ -87,13 +83,13 @@ pub fn unsort(input: &[i32], algorithm: Option<Algorithm>, seed: Option<f64>) ->
 
 #[wasm_bindgen]
 pub fn unsort_steps(input: &[i32], algorithm: Option<Algorithm>, seed: Option<f64>) -> JsValue {
-    let algo = algorithm.unwrap_or(Algorithm::Random);
+    let algo = algorithm.unwrap_or(Algorithm::FisherYates);
     let seed = seed.map(|s| s as u64);
 
     let mut steps = Vec::new();
 
     let result = match algo {
-        Algorithm::Random | Algorithm::FisherYates => {
+        Algorithm::FisherYates => {
             if let Some(seed) = seed {
                 FisherYatesUnsorter::unsort_seeded_with_steps(input, seed, &mut steps)
             } else {
@@ -108,7 +104,6 @@ pub fn unsort_steps(input: &[i32], algorithm: Option<Algorithm>, seed: Option<f6
             }
         }
         Algorithm::Reverse => ReverseUnsorter::unsort_with_steps(input, &mut steps),
-        Algorithm::LastFirst => LastFirstUnsorter::unsort_with_steps(input, &mut steps),
         Algorithm::FaroOut => FaroOutUnsorter::unsort_with_steps(input, &mut steps),
         Algorithm::FaroIn => FaroInUnsorter::unsort_with_steps(input, &mut steps),
         Algorithm::BitReversal => BitReversalUnsorter::unsort_with_steps(input, &mut steps),

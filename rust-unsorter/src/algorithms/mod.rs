@@ -3,7 +3,6 @@ pub mod derangement;
 pub mod faro;
 pub mod fisher_yates;
 pub mod inside_out;
-pub mod last_first;
 pub mod mask;
 pub mod permutation;
 pub mod recursive;

@@ -25,12 +25,18 @@ The result is a package that is easy to consume from React, while the heavy lift
 
 Available algorithms:
 
-* `Random` — shuffles the array randomly
-* `LastFirst` — swaps items from the outside in
-* `Recursive` — recursively rearranges halves of the array
-* `Mask` — uses a custom pseudo-random swap pattern
+* `FisherYates` - uniformly shuffles the array
+* `Sattolo` - creates one random cycle with no fixed points for arrays of length 2 or more
+* `Derangement` - shuffles until no element remains in its original position
+* `Riffle` - simulates a human-style packet interleave
+* `InsideOut` - builds a shuffled permutation incrementally
+* `Reverse` - reverses the array
+* `FaroOut` and `FaroIn` - perfectly interleave the two halves
+* `BitReversal` - reorders values by bit-reversed indices
+* `Recursive` - recursively rearranges halves of the array
+* `Mask` - uses a custom pseudo-random swap pattern
 
-You can also pass an optional seed for the random algorithm to make results reproducible.
+You can also pass an optional seed for the randomized algorithms to make results reproducible.
 
 ## Project structure
 
@@ -147,7 +153,7 @@ import { unsort, Algorithm } from 'react-unsorter-lib';
 const input = [1, 2, 3, 4, 5];
 
 const output = unsort(input, {
-  algorithm: Algorithm.Random,
+  algorithm: Algorithm.FisherYates,
   seed: 123,
 });
 
@@ -160,7 +166,7 @@ console.log(output); // Int32Array
 import { unsortSteps, Algorithm } from 'react-unsorter-lib';
 
 const trace = unsortSteps([1, 2, 3, 4, 5], {
-  algorithm: Algorithm.LastFirst,
+  algorithm: Algorithm.Reverse,
 });
 
 console.log(trace.result); // Int32Array
@@ -197,7 +203,7 @@ unsortSteps(
 * `input` can be either a regular `number[]` or an `Int32Array`
 * the result of `unsort()` is returned as an `Int32Array`
 * `unsortSteps()` returns both the final result and a list of swap operations
-* `seed` is optional and only matters for the seeded random path
+* `seed` is optional and only matters for randomized algorithms
 
 ## Demo app
 
