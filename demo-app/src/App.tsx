@@ -1,26 +1,14 @@
-import { Algorithm } from "react-unsorter-lib";
+import { ALGORITHM_INFO } from "react-unsorter-lib";
 import { RotateCcw } from "lucide-react";
 
 import { useUnsortPlayer } from "@/hooks/useUnsortPlayer";
 import Visualizer from "./components/Visualizer";
 import { Button, Card, RangeField, StatCard, TextField } from "./components/ui";
 
-const ALGORITHMS = [
-  { value: Algorithm.FisherYates, label: "Fisher-Yates" },
-  { value: Algorithm.Sattolo, label: "Sattolo cycle" },
-  { value: Algorithm.Derangement, label: "Derangement" },
-  { value: Algorithm.Riffle, label: "Riffle" },
-  { value: Algorithm.InsideOut, label: "Inside-out" },
-  { value: Algorithm.Reverse, label: "Reverse" },
-  { value: Algorithm.FaroOut, label: "Faro out" },
-  { value: Algorithm.FaroIn, label: "Faro in" },
-  { value: Algorithm.BitReversal, label: "Bit reversal" },
-  { value: Algorithm.Recursive, label: "Recursive halves" },
-  { value: Algorithm.Mask, label: "LCG mask" },
-] as const;
-
 export default function App() {
   const p = useUnsortPlayer();
+  const selectedAlgorithm =
+    ALGORITHM_INFO.find((a) => a.value === p.algorithm) ?? ALGORITHM_INFO[0];
 
   return (
     /* Full viewport — no scrolling on the outer page */
@@ -70,7 +58,7 @@ export default function App() {
                 />
                 <StatCard
                   label="Algorithm"
-                  value={ALGORITHMS.find((a) => a.value === p.algorithm)?.label ?? "Fisher-Yates"}
+                  value={selectedAlgorithm.label}
                 />
                 <StatCard
                   label="Step"
@@ -107,7 +95,7 @@ export default function App() {
                 <div className="mb-3">
                   <p className="kicker mb-1.5 text-[--color-muted]/60">Algorithm</p>
                   <div className="grid grid-cols-2 gap-1.5">
-                    {ALGORITHMS.map((item) => (
+                    {ALGORITHM_INFO.map((item) => (
                       <Button
                         key={item.label}
                         active={p.algorithm === item.value}
@@ -117,6 +105,15 @@ export default function App() {
                       </Button>
                     ))}
                   </div>
+                </div>
+
+                <div className="mb-3 rounded-lg border border-[--color-border] bg-[--color-bg]/35 p-3">
+                  <p className="kicker mb-1.5 text-[--color-muted]/60">
+                    {selectedAlgorithm.seeded ? "Seeded algorithm" : "Deterministic algorithm"}
+                  </p>
+                  <p className="text-[13px] leading-5 text-[--color-muted]">
+                    {selectedAlgorithm.description}
+                  </p>
                 </div>
 
                 <div className="mb-3">
