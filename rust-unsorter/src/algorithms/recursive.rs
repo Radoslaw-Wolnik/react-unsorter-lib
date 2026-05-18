@@ -1,6 +1,6 @@
 use crate::trace::{
-    observer::{NoopObserver, RecordingObserver, StepObserver},
     Step,
+    observer::{NoopObserver, RecordingObserver, StepObserver},
 };
 use rand::{Rng, RngExt};
 
@@ -9,7 +9,7 @@ pub struct RecursiveUnsorter;
 // Helper now takes an `offset` parameter.
 fn helper<T, R: Rng + ?Sized, O: StepObserver>(
     arr: &mut [T],
-    offset: usize,        // <-- new: starting index of this slice in the original array
+    offset: usize, // <-- new: starting index of this slice in the original array
     rng: &mut R,
     observer: &mut O,
 ) {
@@ -29,7 +29,7 @@ fn helper<T, R: Rng + ?Sized, O: StepObserver>(
     let local_j = mid + rng.random_range(0..(n - mid));
 
     // Perform the swap on the slice.
-    arr.swap(local_i, local_j);   // Note: fixed typo `swop` → `swap`
+    arr.swap(local_i, local_j); // Note: fixed typo `swop` → `swap`
 
     // Record the swap with global (absolute) indices.
     observer.swap(offset + local_i, offset + local_j);

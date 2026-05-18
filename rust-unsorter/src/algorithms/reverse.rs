@@ -2,21 +2,15 @@ use crate::trace::{
     Step,
     observer::{NoopObserver, RecordingObserver, StepObserver},
 };
-use rand::RngExt;
 
-pub struct MaskUnsorter;
+pub struct ReverseUnsorter;
 
 fn unsort_impl<T: Clone, O: StepObserver>(input: &[T], observer: &mut O) -> Vec<T> {
     let mut result = input.to_vec();
-    let n = result.len();
+    let len = result.len();
 
-    let mut rng = rand::rng();
-    let mask: u64 = rng.random();
-    let mut seed = mask as u128;
-
-    for i in (1..n).rev() {
-        seed = seed.wrapping_mul(1103515245).wrapping_add(12345);
-        let j = (seed % (i + 1) as u128) as usize;
+    for i in 0..len / 2 {
+        let j = len - 1 - i;
         result.swap(i, j);
         observer.swap(i, j);
     }
@@ -24,7 +18,7 @@ fn unsort_impl<T: Clone, O: StepObserver>(input: &[T], observer: &mut O) -> Vec<
     result
 }
 
-impl MaskUnsorter {
+impl ReverseUnsorter {
     pub fn unsort<T: Clone>(input: &[T]) -> Vec<T> {
         let mut observer = NoopObserver;
         unsort_impl(input, &mut observer)

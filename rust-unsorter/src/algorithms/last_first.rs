@@ -1,6 +1,6 @@
 use crate::trace::{
-    observer::{NoopObserver, RecordingObserver, StepObserver},
     Step,
+    observer::{NoopObserver, RecordingObserver, StepObserver},
 };
 
 pub struct LastFirstUnsorter;
